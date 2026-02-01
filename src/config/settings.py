@@ -1,4 +1,5 @@
 import configparser
+import sys
 from pathlib import Path
 
 DEFAULT_INI = """\
@@ -16,7 +17,14 @@ resume_out = Template_resume.docx
 
 class AppSettings:
     def __init__(self):
-        self.project_dir = Path(__file__).resolve().parents[2]
+        # Determine the base project directory
+        if getattr(sys, 'frozen', False):
+            # Running as PyInstaller exe
+            self.project_dir = Path(sys.executable).parent.resolve()
+        else:
+            # Running as script
+            self.project_dir = Path(__file__).resolve().parents[2]
+
         self.config_path = self.project_dir.joinpath("settings.ini").resolve()
 
         if not self.config_path.exists():
