@@ -28,7 +28,8 @@ def main():
 
     gui = AppGUI(
         resume_workflow=resume_workflow,
-        cover_letter_workflow=cover_letter_workflow
+        cover_letter_workflow=cover_letter_workflow,
+        file_manager=file_manager
     )
     gui.run()
 

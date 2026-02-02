@@ -2,6 +2,7 @@ import threading
 import tkinter as tk
 from tkinter import scrolledtext, font
 
+from src.io import FileManager
 from src.model import JobData
 from src.workflow import ResumeWorkflow, CoverLetterWorkflow
 
@@ -13,20 +14,31 @@ class AppGUI:
 
     def __init__(self,
                  resume_workflow: ResumeWorkflow,
-                 cover_letter_workflow: CoverLetterWorkflow
+                 cover_letter_workflow: CoverLetterWorkflow,
+                 file_manager: FileManager
                  ):
+        # Inject dependencies
         self.resume_workflow = resume_workflow
         self.cover_workflow = cover_letter_workflow
+        self.file_manager = file_manager
 
+        # Build the UI form
         self.root = tk.Tk()
         self.root.tk.call("tk", "scaling", 1.25)
-        self.root.title("Resume & Cover Letter Generator")
+        self.root.title("Chat BDD: Resume Tailoring")
+        icon_path = self.file_manager.project_dir / "bdd.ico"
+        try:
+            if icon_path.exists():
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Warning: Could not load icon: {e}")
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(size=11)
         self.text_font = font.nametofont("TkTextFont")
         self.text_font.configure(size=11)
         self._build_form()
 
+        # Initialize loading spinner variables
         self._loading = False
         self._spinner_chars = "⠁⠂⠄⡀⡈⡐⡠⣀⣁⣂⣄⣌⣔⣤⣥⣦⣮⣶⣷⣿⡿⠿⢟⠟⡛⠛⠫⢋⠋⠍⡉⠉⠑⠡⢁"
         self._spinner_index = 0
@@ -97,11 +109,11 @@ class AppGUI:
         cover_cb.grid(row=5, column=0, sticky="w", **pad_opts)
 
         # Generate button
-        generate_btn = tk.Button(self.root, text="Generate", command=self._generate)
-        generate_btn.grid(row=5, column=1, sticky="w", **pad_opts)
+        self.generate_btn = tk.Button(self.root, text="Generate", command=self._generate)
+        self.generate_btn.grid(row=5, column=1, sticky="w", **pad_opts)
 
         # Status/output label
-        self.status_label = tk.Label(self.root, text="Mr. GPT IS READY TO COOK  👈(￣▽￣👈)", fg="Black", anchor="w", justify="left")
+        self.status_label = tk.Label(self.root, text="Chat BDD IS READY TO COOK  👈(￣▽￣👈)", fg="Black", anchor="w", justify="left")
         self.status_label.grid(row=6, column=0, columnspan=3, sticky="w", **pad_opts)
 
         # Make job description expand if window resized
