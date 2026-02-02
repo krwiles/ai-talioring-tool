@@ -101,12 +101,12 @@ class AppGUI:
 
         # Cover Letter checkbox
         self.cover_var = tk.BooleanVar(value=True)  # default ON
-        cover_cb = tk.Checkbutton(
+        self.cover_cb = tk.Checkbutton(
             self.root,
             text="Cover Letter",
             variable=self.cover_var
         )
-        cover_cb.grid(row=5, column=0, sticky="w", **pad_opts)
+        self.cover_cb.grid(row=5, column=0, sticky="w", **pad_opts)
 
         # Generate button
         self.generate_btn = tk.Button(self.root, text="Generate", command=self._generate)
@@ -164,6 +164,7 @@ class AppGUI:
         return valid
 
     def _run_workflows(self, job: JobData):
+        self._set_ui_state(False)
         try:
             self._spinner_text = "Generating Resume  (～￣▽￣)～"
             self._start_spinner()
@@ -191,9 +192,11 @@ class AppGUI:
         self.location_optional.config(text="(optional)")
         self.location_entry.delete(0, tk.END)
         self.description_text.delete("1.0", tk.END)
+        self._set_ui_state(True)
 
     def _on_error(self, message):
         self.status_label.config(text="Oopsie (￣ー￣* )... "+message, fg="red")
+        self._set_ui_state(True)
 
     def _start_spinner(self):
         self._loading = True
@@ -212,6 +215,19 @@ class AppGUI:
 
     def _stop_spinner(self):
         self._loading = False
+
+    def _set_ui_state(self, enabled: bool):
+        state = "normal" if enabled else "disabled"
+        inputs = [
+            self.company_entry,
+            self.position_entry,
+            self.location_entry,
+            self.description_text,
+            self.generate_btn,
+            self.cover_cb
+        ]
+        for inp in inputs:
+            inp.config(state=state)
 
     def run(self):
         """Start the Tkinter main loop"""
