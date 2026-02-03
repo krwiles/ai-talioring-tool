@@ -187,12 +187,13 @@ class AppGUI:
             fg="green"
         )
 
+        self._set_ui_state(True)
         self.company_entry.delete(0, tk.END)
         self.position_entry.delete(0, tk.END)
         self.location_optional.config(text="(optional)")
         self.location_entry.delete(0, tk.END)
         self.description_text.delete("1.0", tk.END)
-        self._set_ui_state(True)
+
 
     def _on_error(self, message):
         self.status_label.config(text="Oopsie (￣ー￣* )... "+message, fg="red")
